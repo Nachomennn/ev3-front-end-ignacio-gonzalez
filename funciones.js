@@ -17,6 +17,7 @@ document.getElementById('btnSave').addEventListener('click', () => {
             email: document.getElementById('email').value,
             fono: document.getElementById('fono').value
         }
+        
         //si el id es vacio se guarda
         if(id == ''){
             save(persona) 
@@ -38,7 +39,6 @@ document.getElementById('btnSave').addEventListener('click', () => {
         id = ''        
     }
 })
-
 
 //DOMContentLoaded es un vento que se activa al recargar la página web
 window.addEventListener('DOMContentLoaded', () => {
@@ -121,3 +121,4 @@ window.addEventListener('DOMContentLoaded', () => {
         })
     })
 })
+

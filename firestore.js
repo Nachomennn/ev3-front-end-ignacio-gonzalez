@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"
 //funciones de firestore
-import { addDoc, collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+import { addDoc, collection, deleteDoc, doc, getDoc, getFirestore, onSnapshot, query, where, getDocs, updateDoc  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
 // TODO: Documentación
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -14,16 +14,26 @@ const firebaseConfig = {
     messagingSenderId: "910083954020",
     appId: "1:910083954020:web:bbbd201d62c2c995c2d671"
   };
-
+  
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 //getFirestore es la función que permite trae la base de datos para su utilización
 const db = getFirestore(app);
 //save es una función creada que invoca la función de firestore para gaurdar
-export const save = (emp) => {
-    //addDoc es la función de firestore que guardar un documento en una colección
-    //collection es una función de firestore que permite acceder a una colección de la base de datos 
-    addDoc(collection(db, 'Empleados'), emp)
+export const save = async (emp) => {
+    const run = emp.run;
+    const q = query(collection(db, 'Empleados'), where('run', '==', run));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+        await addDoc(collection(db, 'Empleados'), emp)
+    } else {
+        Swal.fire({
+            title: "Error",
+            text: "El código ya existe. Por favor, elija otro.",
+            icon: "error"
+        })
+    }
 }
 
 //función para cargar todos los documentos de la colección
@@ -44,6 +54,23 @@ export const remove = (id) => {
 export const selectOne = (id) => getDoc(doc(db, 'Empleados', id))
 
 //FALTA FUNCIÓN EDITAR
-export const update  = (id, emp) =>{
-    updateDoc(doc(db,'Empleados', id),emp)
-}
+export const update = async (id, emp) => {
+    const run = emp.run;
+    const q = query(collection(db, 'Empleados'), where('run', '==', run));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty || querySnapshot.docs[0].id === id) {
+        await updateDoc(doc(db, 'Empleados', id), emp);
+        Swal.fire({
+            title: "Actualizado!",
+            text: "Su registro ha sido actualizado",
+            icon: "success"
+        })
+    } else {
+        Swal.fire({
+            title: "Error",
+            text: "Error al actualizar",
+            icon: "error"
+        })
+    }
+};
